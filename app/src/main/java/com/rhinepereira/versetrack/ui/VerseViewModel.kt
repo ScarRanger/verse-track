@@ -38,6 +38,20 @@ class VerseViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun addNoteAndVerse(themeName: String, reference: String, content: String) {
+        viewModelScope.launch {
+            val newNote = Note(theme = themeName)
+            repository.insertNote(newNote)
+            repository.insertVerse(Verse(noteId = newNote.id, reference = reference, content = content))
+        }
+    }
+
+    fun updateVerse(verse: Verse) {
+        viewModelScope.launch {
+            repository.updateVerse(verse)
+        }
+    }
+
     fun deleteNote(note: Note) {
         viewModelScope.launch {
             repository.deleteNote(note)

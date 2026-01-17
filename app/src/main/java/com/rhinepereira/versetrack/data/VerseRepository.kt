@@ -24,6 +24,11 @@ class VerseRepository(private val context: Context, private val verseDao: VerseD
         scheduleSync()
     }
 
+    suspend fun updateVerse(verse: Verse) {
+        verseDao.updateVerse(verse.copy(isSynced = false))
+        scheduleSync()
+    }
+
     suspend fun deleteNote(note: Note) {
         verseDao.deleteNote(note)
         withContext(Dispatchers.IO) {

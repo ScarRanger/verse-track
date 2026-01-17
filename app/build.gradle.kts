@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.secrets)
 }
 
 android {
@@ -38,6 +39,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -58,7 +60,6 @@ dependencies {
 
     // Supabase
     implementation(libs.supabase.postgrest)
-//    implementation(libs.supabase.gotrue)
     implementation(libs.kotlinx.serialization.json)
     
     // Ktor Engine (Required for Supabase)

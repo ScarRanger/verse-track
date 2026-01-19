@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [Note::class, Verse::class], version = 2, exportSchema = false)
+@Database(entities = [Note::class, Verse::class, DailyRecord::class], version = 3, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun verseDao(): VerseDao
 
@@ -20,7 +20,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "verse_database"
                 )
-                .fallbackToDestructiveMigration() // Simplified for development
+                .fallbackToDestructiveMigration()
                 .build()
                 INSTANCE = instance
                 instance

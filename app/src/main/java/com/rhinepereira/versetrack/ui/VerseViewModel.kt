@@ -22,6 +22,15 @@ class VerseViewModel(application: Application) : AndroidViewModel(application) {
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
+        
+        // Initial fetch from cloud to populate local database if empty
+        fetchCloudData()
+    }
+
+    private fun fetchCloudData() {
+        viewModelScope.launch {
+            repository.fetchFromSupabase()
+        }
     }
 
     fun getVersesForNote(noteId: String): Flow<List<Verse>> = repository.getVersesForNote(noteId)

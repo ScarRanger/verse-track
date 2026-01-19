@@ -10,8 +10,8 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
@@ -29,7 +29,6 @@ import com.rhinepereira.versetrack.data.BibleData
 import com.rhinepereira.versetrack.data.Note
 import com.rhinepereira.versetrack.data.NoteWithVerses
 import com.rhinepereira.versetrack.data.Verse
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,7 +62,7 @@ fun VerseScreen(
                 navigationIcon = {
                     if (selectedNoteWithVerses != null) {
                         IconButton(onClick = { selectedNoteWithVerses = null }) {
-                            Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                         }
                     }
                 }
@@ -80,19 +79,25 @@ fun VerseScreen(
         Box(modifier = Modifier.padding(padding)) {
             if (selectedNoteWithVerses == null) {
                 // Themes Grid
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(notesWithVerses) { noteWithVerses ->
-                        ThemeCard(
-                            noteWithVerses = noteWithVerses,
-                            onClick = { selectedNoteWithVerses = noteWithVerses },
-                            onDelete = { noteToDelete = noteWithVerses.note }
-                        )
+                if (notesWithVerses.isEmpty()) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("No themes yet. Add one to start!", color = MaterialTheme.colorScheme.outline)
+                    }
+                } else {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(notesWithVerses, key = { it.note.id }) { noteWithVerses ->
+                            ThemeCard(
+                                noteWithVerses = noteWithVerses,
+                                onClick = { selectedNoteWithVerses = noteWithVerses },
+                                onDelete = { noteToDelete = noteWithVerses.note }
+                            )
+                        }
                     }
                 }
             } else {
@@ -105,7 +110,7 @@ fun VerseScreen(
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(verses) { verse ->
+                    items(verses, key = { it.id }) { verse ->
                         VerseItem(
                             verse = verse,
                             onDelete = { verseToDelete = verse },
@@ -280,7 +285,7 @@ fun SharedTextDialog(
     
     // Remove Bible version (e.g., "RSV-C", "NIV", "KJV") from the end of the first line
     // This matches common 3-5 letter abbreviations at the end of the reference
-    reference = reference.replace(Regex("\\s+[A-Z0-9-]{2,}\$"), "").trim()
+    reference = reference.replace(Regex("\\s+[A-Z0-9-]{2,}$"), "").trim()
     
     val content = lines.drop(1).filter { !it.startsWith("http") }.joinToString("\n").trim()
 

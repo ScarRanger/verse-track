@@ -55,7 +55,31 @@ class VerseRepository(private val context: Context, private val verseDao: VerseD
         }
     }
 
-    private fun scheduleSync() {
+    suspend fun fetchFromSupabase() = withContext(Dispatchers.IO) {
+        try {
+            // Fetch Notes
+            val notes = SupabaseConfig.client.postgrest["notes"].select().decodeList<Note>()
+            notes.forEach { note ->
+                verseDao.insertNote(note.copy(isSynced = true))
+            }
+
+            // Fetch Verses
+            val verses = SupabaseConfig.client.postgrest["verses"].select().decodeList<Verse>()
+            verses.forEach { verse ->
+                verseDao.insertVerse(verse.copy(isSynced = true))
+            }
+            
+            // Fetch Daily Records as well
+            val records = SupabaseConfig.client.postgrest["daily_records"].select().decodeList<DailyRecord>()
+            records.forEach { record ->
+                verseDao.insertDailyRecord(record.copy(isSynced = true))
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    fun scheduleSync() {
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()

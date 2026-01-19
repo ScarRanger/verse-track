@@ -33,6 +33,13 @@ class SyncWorker(
                 dao.updateVerse(verse.copy(isSynced = true))
             }
 
+            // 3. Sync Daily Records
+            val unsyncedRecords = dao.getUnsyncedDailyRecords()
+            unsyncedRecords.forEach { record ->
+                SupabaseConfig.client.postgrest["daily_records"].upsert(record)
+                dao.updateDailyRecord(record.copy(isSynced = true))
+            }
+
             Result.success()
         } catch (e: Exception) {
             e.printStackTrace()

@@ -8,7 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.rhinepereira.versetrack.ui.VerseScreen
+import com.rhinepereira.versetrack.ui.MainContainer
 import com.rhinepereira.versetrack.ui.theme.VerseTrackTheme
 
 class MainActivity : ComponentActivity() {
@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             VerseTrackTheme {
-                VerseScreen(
+                MainContainer(
                     sharedText = sharedText,
                     onSharedTextConsumed = { sharedText = null }
                 )

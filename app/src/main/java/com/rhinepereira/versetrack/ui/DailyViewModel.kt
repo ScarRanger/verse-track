@@ -21,8 +21,9 @@ class DailyViewModel(application: Application) : AndroidViewModel(application) {
         repository = VerseRepository(application, dao)
         
         val startOfToday = getStartOfDay(System.currentTimeMillis())
+        val endOfToday = startOfToday + (24 * 60 * 60 * 1000)
         
-        todayRecord = dao.getRecordForDate(startOfToday).stateIn(
+        todayRecord = dao.getRecordForDate(startOfToday, endOfToday).stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = null
@@ -33,6 +34,14 @@ class DailyViewModel(application: Application) : AndroidViewModel(application) {
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
+        
+        fetchLatestData()
+    }
+
+    private fun fetchLatestData() {
+        viewModelScope.launch {
+            repository.fetchFromSupabase()
+        }
     }
 
     private fun getStartOfDay(timestamp: Long): Long {
@@ -55,7 +64,8 @@ class DailyViewModel(application: Application) : AndroidViewModel(application) {
     ) {
         viewModelScope.launch {
             val startOfToday = getStartOfDay(System.currentTimeMillis())
-            val existing = dao.getRecordForDateSync(startOfToday) ?: DailyRecord(date = startOfToday)
+            val endOfToday = startOfToday + (24 * 60 * 60 * 1000)
+            val existing = dao.getRecordForDateSync(startOfToday, endOfToday) ?: DailyRecord(date = startOfToday)
             
             val updated = existing.copy(
                 readToday = readToday ?: existing.readToday,

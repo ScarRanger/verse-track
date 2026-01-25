@@ -69,10 +69,22 @@ class VerseRepository(private val context: Context, private val verseDao: VerseD
                 verseDao.insertVerse(verse.copy(isSynced = true))
             }
             
-            // Fetch Daily Records as well
+            // Fetch Daily Records
             val records = SupabaseConfig.client.postgrest["daily_records"].select().decodeList<DailyRecord>()
             records.forEach { record ->
                 verseDao.insertDailyRecord(record.copy(isSynced = true))
+            }
+
+            // Fetch Categories
+            val categories = SupabaseConfig.client.postgrest["personal_note_categories"].select().decodeList<PersonalNoteCategory>()
+            categories.forEach { category ->
+                verseDao.insertCategory(category.copy(isSynced = true))
+            }
+
+            // Fetch Personal Notes
+            val personalNotes = SupabaseConfig.client.postgrest["personal_notes"].select().decodeList<PersonalNote>()
+            personalNotes.forEach { personalNote ->
+                verseDao.insertPersonalNote(personalNote.copy(isSynced = true))
             }
         } catch (e: Exception) {
             e.printStackTrace()

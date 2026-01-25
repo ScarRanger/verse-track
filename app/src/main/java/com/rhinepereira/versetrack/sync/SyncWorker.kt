@@ -19,7 +19,7 @@ class SyncWorker(
         val dao = database.verseDao()
 
         try {
-            // 1. Sync Notes
+            // 1. Sync Notes (Themes)
             val unsyncedNotes = dao.getUnsyncedNotes()
             unsyncedNotes.forEach { note ->
                 SupabaseConfig.client.postgrest["notes"].upsert(note)
@@ -38,6 +38,20 @@ class SyncWorker(
             unsyncedRecords.forEach { record ->
                 SupabaseConfig.client.postgrest["daily_records"].upsert(record)
                 dao.updateDailyRecord(record.copy(isSynced = true))
+            }
+
+            // 4. Sync Personal Note Categories
+            val unsyncedCategories = dao.getUnsyncedCategories()
+            unsyncedCategories.forEach { category ->
+                SupabaseConfig.client.postgrest["personal_note_categories"].upsert(category)
+                dao.insertCategory(category.copy(isSynced = true))
+            }
+
+            // 5. Sync Personal Notes
+            val unsyncedPersonalNotes = dao.getUnsyncedPersonalNotes()
+            unsyncedPersonalNotes.forEach { note ->
+                SupabaseConfig.client.postgrest["personal_notes"].upsert(note)
+                dao.insertPersonalNote(note.copy(isSynced = true))
             }
 
             Result.success()
